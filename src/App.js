@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AddUsuario from "./Componentes/AddUsuario/AddUsuario";
 import Usuario from "./Componentes/Usuario/Usuario";
+import axios from 'axios'
 
 const usuariosLocal = [
   {
@@ -22,14 +23,42 @@ const usuariosLocal = [
 ]
 
 function App() {
-  const [usuarios, setUsuarios] = useState(usuariosLocal)
+
+
+  const [usuarios, setUsuarios] = useState([])
+ // RENDERIZANDO NA TELA O CHAMADO DA API
+  useEffect(()=>{
+    allUserApi()
+  },[])
+
+ 
+// CHAMANDO API
+  const allUserApi = () => {
+ 
+    axios.get('https://us-central1-labenu-apis.cloudfunctions.net/labenusers/users', {
+    headers: {
+      Authorization: 'mario-carneiro-easley'
+    }
+  }).then((response) => {
+    setUsuarios(response.data)
+    console.log(response.data)
+  }).catch((error) => {
+    console.log(error)
+  })
+
+
+  }
+
+
+
+
   return (
     <>
       <p>Para esta aula usaremos a <a href="https://documenter.getpostman.com/view/7549981/SzfCT5G2#intro" target="_blank" rel="noreferrer">API Labenusers</a></p>
-      <AddUsuario />
+      <AddUsuario allUserApi={allUserApi}/>
       <hr/>
       {usuarios.map((usuario) => {
-        return <Usuario key={usuario.id} usuario={usuario} />
+        return <Usuario key={usuario.id} usuario={usuario} allUserApi={allUserApi} />
       })}
     </>
   )
